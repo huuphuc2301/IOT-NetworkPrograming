@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 public class MQTTClient {
     private final String MQTT_ADDRESS = "tcp://127.0.0.1:1883";
     private final String TEMPERATURE_TOPIC = "temperature";
-    private final String NODE_START_TOPIC = "node_start";
     private final String CONTROL_NODE_TOPIC = "control_node";
     private final String CONNECTION_TOPIC = "connection";
     private IMqttClient mqttClient;
@@ -29,10 +28,6 @@ public class MQTTClient {
             }
 
             public void messageArrived(String topic, MqttMessage message) {
-                if (topic.equals(NODE_START_TOPIC)) {
-                    String nodeId = new String(message.getPayload());
-                    System.out.println("Node " + nodeId + " started");
-                }
                 if (topic.equals(CONNECTION_TOPIC)) {
                     String nodeId = new String(message.getPayload());
                     nodeHealthChecker.addNodeConnection(nodeId);
@@ -42,9 +37,9 @@ public class MQTTClient {
             public void deliveryComplete(IMqttDeliveryToken token) {
             }
         });
-        String[] subscribeTopics = new String[]{NODE_START_TOPIC,CONNECTION_TOPIC};
-        int[] qos = {1,1};
-        mqttClient.subscribe(subscribeTopics,qos);
+        String[] subscribeTopics = new String[] {CONNECTION_TOPIC};
+        int[] qos = {1};
+        mqttClient.subscribe(subscribeTopics, qos);
     }
 
     @Scheduled(fixedRate = 5000)
