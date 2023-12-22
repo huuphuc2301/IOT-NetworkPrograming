@@ -2,7 +2,8 @@ create table node
 (
     id   varchar(55)  not null
         primary key,
-    name varchar(255) null
+    name varchar(255) null,
+    status bool not null
 );
 
 create table temperature

@@ -24,4 +24,16 @@ public class Node {
     private String id;
 
     private String name;
+
+    private boolean status;
+
+    public Node(String id, String name, boolean status) {
+        this.id = id;
+        this.name = name;
+        this.status = status;
+    }
+
+    public Node() {
+
+    }
 }
