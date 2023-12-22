@@ -1,5 +1,6 @@
 package org.example;
 
+import java.time.Instant;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
@@ -14,8 +15,8 @@ public class Main {
     private static final String TEMPERATURE_TOPIC = "temperature";
     private static final String CONTROL_NODE_TOPIC = "control_node";
     private static final String CONNECTION_TOPIC = "connection";
-
     private static IMqttClient client;
+    private static Integer currentTemperature;
 
     public static void main(String[] args) throws MqttException {
         String clientId = args[0];
@@ -35,7 +36,6 @@ public class Main {
             }
 
             public void deliveryComplete(IMqttDeliveryToken token) {
-                System.out.println("deliveryComplete---------" + token.isComplete());
             }
         });
 
@@ -43,7 +43,12 @@ public class Main {
 
         //scheduled send health-check message
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.scheduleAtFixedRate(healthCheckTask(clientId), 0,10, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(healthCheckTask(clientId), 0, 10, TimeUnit.SECONDS);
+
+        //schedule send temperature
+        currentTemperature = randomTemperature(null);
+        executorService.scheduleAtFixedRate(sendTemperatureTask(clientId, currentTemperature), 5,
+            10, TimeUnit.SECONDS);
     }
 
     private static void handleControlNodeTopic(MqttMessage message) {
@@ -60,6 +65,33 @@ public class Main {
                 throw new RuntimeException(e);
             }
         };
+    }
+
+    private static Runnable sendTemperatureTask(String clientId, Integer preTemperature) {
+        return () -> {
+            var now = Instant.now();
+            currentTemperature = randomTemperature(preTemperature);
+            String messageContent = clientId + " " + currentTemperature + " " + now;
+            MqttMessage message = new MqttMessage(messageContent.getBytes());
+            try {
+                System.out.println("Sent temperature to gateway: " + currentTemperature);
+                client.publish(TEMPERATURE_TOPIC, message);
+            } catch (MqttException e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
+    private static Integer randomTemperature(Integer preTemperature) {
+        if (preTemperature == null) {
+            return randomNumber(15, 30);
+        }
+
+        return randomNumber(preTemperature - 1, preTemperature + 1);
+    }
+
+    private static Integer randomNumber(Integer min, Integer max) {
+        return (int) ((Math.random() * (max - min)) + min);
     }
 
 }

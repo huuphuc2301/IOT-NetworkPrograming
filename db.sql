@@ -12,7 +12,7 @@ create table temperature
         primary key,
     node_id    varchar(55) null,
     value      int         null,
-    created_at timestamp   null,
+    create_time timestamp   null,
     constraint node_temperature_node_id_fk
         foreign key (node_id) references node (id)
 );
