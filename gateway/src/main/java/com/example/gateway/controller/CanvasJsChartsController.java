@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.google.gson.Gson;
 
 @Controller
-@RequestMapping("/")
+@RequestMapping("/abc")
 public class CanvasJsChartsController extends HttpServlet {
 
     /**

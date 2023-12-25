@@ -46,8 +46,7 @@ public class Main {
         executorService.scheduleAtFixedRate(healthCheckTask(clientId), 0, 10, TimeUnit.SECONDS);
 
         //schedule send temperature
-        currentTemperature = randomTemperature(null);
-        executorService.scheduleAtFixedRate(sendTemperatureTask(clientId, currentTemperature), 5,
+        executorService.scheduleAtFixedRate(sendTemperatureTask(clientId), 5,
             10, TimeUnit.SECONDS);
     }
 
@@ -67,10 +66,10 @@ public class Main {
         };
     }
 
-    private static Runnable sendTemperatureTask(String clientId, Integer preTemperature) {
+    private static Runnable sendTemperatureTask(String clientId) {
         return () -> {
             var now = Instant.now();
-            currentTemperature = randomTemperature(preTemperature);
+            currentTemperature = randomTemperature(currentTemperature);
             String messageContent = clientId + " " + currentTemperature + " " + now;
             MqttMessage message = new MqttMessage(messageContent.getBytes());
             try {
@@ -84,14 +83,14 @@ public class Main {
 
     private static Integer randomTemperature(Integer preTemperature) {
         if (preTemperature == null) {
-            return randomNumber(15, 30);
+            return randomNumber(20, 25);
         }
 
         return randomNumber(preTemperature - 1, preTemperature + 1);
     }
 
     private static Integer randomNumber(Integer min, Integer max) {
-        return (int) ((Math.random() * (max - min)) + min);
+        return (int) ((Math.random() * (max - min + 1)) + min);
     }
 
 }

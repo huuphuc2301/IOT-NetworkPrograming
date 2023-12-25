@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CanvasJS Chart in Spring MVC - Thymeleaf</title>
+    <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</head>
+<body>
+<div id="chartContainer" style="width:100%; height: 400px"></div>
+<script th:inline="javascript">
+    window.onload = function () {
+        var node = /*[[${node}]]*/ {};
+        var dataPoints = /*[[${dataPoints}]]*/ {};
+
+        console.log(dataPoints);
+        var chart = new CanvasJS.Chart("chartContainer", {
+            theme: "light2", // "light1", "dark1", "dark2"
+            animationEnabled: true,
+            title: {
+                text: `Temperature - ${node.name}`
+            },
+            axisX: {
+                valueFormatString: "DD-MM-YYYY HH:mm:ss"
+            },
+            axisY: {
+                title: "Temperature (in °C)",
+                includeZero: true,
+                suffix: " °C"
+            },
+            data: [{
+                type: "line",
+                xValueType: "dateTime",
+                xValueFormatString: "DD-MM-YYYY HH:mm:ss",
+                yValueFormatString: "#,##0 °C",
+                dataPoints: dataPoints
+            }]
+        });
+
+        chart.render();
+
+    }
+</script>
+</body>
+</html>

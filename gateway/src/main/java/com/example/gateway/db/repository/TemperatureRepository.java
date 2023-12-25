@@ -15,5 +15,5 @@ public interface TemperatureRepository extends JpaRepository<Temperature, Long> 
         where t.node.id = :nodeId
         order by t.id
     """)
-    List<Temperature> findAllByNodeId(@Param("nodeId") Long nodeId);
+    List<Temperature> findAllByNodeId(@Param("nodeId") String nodeId);
 }
